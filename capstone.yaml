@@ -1,0 +1,60 @@
+name: flyrank-capstone-widget-platform
+stack: Node.js 24, Express, PostgreSQL 16, plain JavaScript
+run: npm run init && docker compose up --build -d --wait
+seed: docker compose exec -T api npm run seed
+test: docker compose exec -T api npm test
+base_url: http://localhost:4000
+customer_url: http://localhost:5500
+endpoints:
+  - method: GET
+    path: /health
+    auth: false
+    expected_status: 200
+  - method: POST
+    path: /api/auth/login
+    auth: false
+    body: '{"email":"alice@example.test","password":"<DEMO_PASSWORD from local .env>"}'
+    expected_status: 200
+  - method: GET
+    path: /api/widgets
+    auth: bearer
+    expected_status: 200
+  - method: GET
+    path: /widgets/11111111-1111-4111-8111-111111111111/config
+    auth: false
+    expected_status: 200
+  - method: GET
+    path: /widget.v1.js?id=11111111-1111-4111-8111-111111111111
+    auth: false
+    expected_status: 200
+  - method: OPTIONS
+    path: /submissions
+    auth: false
+    expected_status: 204
+  - method: POST
+    path: /submissions
+    auth: false
+    headers:
+      Content-Type: application/json
+      Origin: http://localhost:5500
+      Idempotency-Key: replace-with-unique-probe-key
+    body: '{"widget_id":"11111111-1111-4111-8111-111111111111","fields":{"email":"probe@example.test"},"website":""}'
+    expected_status: 201
+  - method: GET
+    path: /api/submissions
+    auth: bearer
+    expected_status: 200
+  - method: GET
+    path: /api/dashboard
+    auth: bearer
+    expected_status: 200
+  - method: GET
+    path: /api/jobs
+    auth: bearer
+    expected_status: 200
+notes:
+  - Requires Node.js 22+ and running Docker Desktop with Linux containers.
+  - Read generated DEMO_PASSWORD locally; never commit .env or tokens.
+  - Run seed after startup; login returns the owner bearer token.
+  - Probe POST uses a unique key; exact replay returns 200.
+  - Mock geo and console notifications need no external accounts.
