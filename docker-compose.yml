@@ -1,0 +1,49 @@
+name: flyrank-widget-platform
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-widget_platform}
+      POSTGRES_USER: ${POSTGRES_USER:-widget}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run npm run init first}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - widget_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-widget} -d ${POSTGRES_DB:-widget_platform}"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-widget}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-widget_platform}
+    ports:
+      - "127.0.0.1:4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+  worker:
+    build: .
+    command: ["npm", "run", "worker"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-widget}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-widget_platform}
+    depends_on:
+      db:
+        condition: service_healthy
+  customer:
+    build: .
+    command: ["npm", "run", "customer"]
+    env_file: .env
+    ports:
+      - "127.0.0.1:5500:5500"
+volumes:
+  widget_pgdata:
