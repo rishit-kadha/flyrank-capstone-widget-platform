@@ -10,7 +10,7 @@ export function createPool(connectionString, options = {}) {
   if (schema !== undefined && !/^[a-z_][a-z0-9_]{0,62}$/.test(schema)) {
     throw new Error('Database schema must be a lowercase PostgreSQL identifier.');
   }
-  return new pg.Pool({
+  const pool = new pg.Pool({
     connectionString,
     max: 10,
     connectionTimeoutMillis: 5000,
@@ -18,6 +18,9 @@ export function createPool(connectionString, options = {}) {
     ...poolOptions,
     ...(schema ? { options: `-c search_path=${schema}` } : {}),
   });
+  // Broken idle connections are discarded by pg; avoid an unhandled event crash.
+  pool.on('error', error => console.error(JSON.stringify({ event: 'database_pool_error', code: error.code || 'connection_error' })));
+  return pool;
 }
 
 /** Apply ordered migrations once; a schema-local lock serializes concurrent starts. */

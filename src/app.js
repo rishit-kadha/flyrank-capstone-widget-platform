@@ -1,6 +1,5 @@
 import express from 'express';
 import { fileURLToPath } from 'node:url';
-import { join } from 'node:path';
 import { loadConfig } from './config.js';
 import { AppError, notFound, errorHandler } from './errors.js';
 import { parse, widgetSchema, widgetPatchSchema, loginSchema, uuidSchema, submissionSchema, idempotencySchema, demoSchema, querySchema } from './validation.js';
@@ -127,7 +126,7 @@ export function createApp({ repo, config: supplied = {}, geoService, ipResolver 
   });
   app.get('/widget.v1.js', (req, res) => {
     res.set('Cache-Control', 'public, max-age=31536000, immutable');
-    res.sendFile(join(publicDir, 'widget.v1.js'), { cacheControl: false });
+    res.sendFile('widget.v1.js', { root: publicDir, cacheControl: false });
   });
   app.get('/widget.js', (req, res) => {
     const target = new URL('/widget.v1.js', config.publicBaseUrl);
