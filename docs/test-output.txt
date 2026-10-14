@@ -1,0 +1,44 @@
+
+> flyrank-capstone-widget-platform@1.0.0 test
+> node --test --test-concurrency=1 test/*.test.js
+
+▶ real PostgreSQL acceptance
+  ✔ passwords use random salts and reject an incorrect password (94.5143ms)
+  ✔ health checks the database and authentication fails with structured JSON (41.0653ms)
+  ✔ owner can create, read, update, embed, and delete a widget (33.3687ms)
+  ✔ tenant A cannot list, read, edit, delete, or embed tenant B widgets (13.864ms)
+  ✔ widget schemas reject duplicate, reserved, unsupported, and unknown fields (8.965ms)
+  ✔ public configuration and the versioned script have cross-origin cache contracts (8.6218ms)
+  ✔ cross-origin preflight permits the idempotency header without credentials (0.75ms)
+  ✔ malformed JSON, oversized bodies, invalid identifiers, and malformed pagination return JSON 4xx (15.7699ms)
+  ✔ submissions validate required, email, type, length, unknown, and configured custom fields (43.299ms)
+  ✔ honeypot and inactive widgets reject submissions without storing a lead (29.4223ms)
+  ✔ geolocation tries A, falls back to B, and stores null while both providers are unavailable (45.4748ms)
+  ✔ submissions require a key, replay exactly once, and reject changed content with the same key (33.1676ms)
+  ✔ concurrent requests with the same key create one lead and one notification job (32.6388ms)
+  ✔ a failed outbox insert rolls back the submission transaction (13.5725ms)
+  ✔ database constraints reject mismatched widget and tenant ownership (2.1159ms)
+  ✔ default trust-proxy ignores forged IP headers and still throttles the same client (22.7968ms)
+  ✔ per-IP throttling preserves access for a different legitimate IP (26.9163ms)
+  ✔ per-widget throttling limits a burst distributed across different IPs (23.9693ms)
+  ✔ tenant A cannot read tenant B leads, filter by their widget, or see their jobs (19.0001ms)
+  ✔ failed notifications retry, preserve the lead, and persist a terminal alert (97.6265ms)
+  ✔ an interrupted worker lease can be recovered without creating another job (28.5451ms)
+  ✔ dashboard aggregates equal the stored tenant-scoped leads and exclude other tenants (13.3414ms)
+  ✔ demo controls require authentication and can be disabled in configuration (7.5918ms)
+  ✔ session tokens are stored as hashes and expired sessions cannot authenticate (33.1108ms)
+  ✔ logout invalidates the session token (33.1892ms)
+✔ real PostgreSQL acceptance (998.776ms)
+✔ live geolocation does not send private, loopback, invalid, or mapped private IPs to providers (2.069ms)
+✔ live provider A is used when its response is valid (14.9578ms)
+✔ live provider B handles primary HTTP errors, invalid responses, and rejected requests (1.5386ms)
+✔ unavailable or invalid live providers result in null enrichment (0.423ms)
+✔ disabled enrichment makes no provider requests (0.1231ms)
+ℹ tests 30
+ℹ suites 1
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1369.3426
